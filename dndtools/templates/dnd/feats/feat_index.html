@@ -6,7 +6,7 @@
 {% block title %}Feats{% endblock %}
 
 {% block breadcrumbs %}
-    &raquo; <a href="{% url 'feat_index' %}">Feats</a>
+    &raquo; <a href="{% url 'dnd:feats:feat_index' %}">Feats</a>
 {% endblock %}
 
 {% block content %}
@@ -14,7 +14,7 @@
 <h2>Feats</h2>
 
 <span class="small-warning-bar">
-    Experimental filter form &mdash; <a href="{% url 'contact' %}">let us know</a> what you think about it!
+    Experimental filter form &mdash; <a href="{% url 'dnd:contacts:contact' %}">let us know</a> what you think about it!
 </span>
 {% include "dnd/filter_form.html" %}
 

@@ -1,8 +1,8 @@
 from django.db.models import Q
-import django_filters2
+import django_filters
 
 
-class FeatMultiPrerequisiteFieldFilter(django_filters2.CharFilter):
+class FeatMultiPrerequisiteFieldFilter(django_filters.CharFilter):
     def filter(self, qs, value):
         if value:
             return qs.filter(

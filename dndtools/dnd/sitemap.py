@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.contrib.sitemaps import Sitemap
 from dnd.models import (
     Spell, DndEdition, Rulebook, CharacterClass, Domain, SpellDescriptor,

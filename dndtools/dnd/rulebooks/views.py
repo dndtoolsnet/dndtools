@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
-
-from django.shortcuts import get_object_or_404, render_to_response
+from django.shortcuts import get_object_or_404, render
 from django.template.context import RequestContext
 from dnd.filters import RulebookFilter
 from dnd.menu import menu_item, submenu_item, MenuItem
@@ -19,14 +17,10 @@ def rulebook_list(request):
 
     paginator = DndPaginator(f.qs, request)
 
-    return render_to_response('dnd/rulebooks/rulebook_list.html',
-                              {
-                                  'request': request,
-                                  'rulebook_list': paginator.items(),
-                                  'paginator': paginator,
-                                  'filter': f,
-                                  'form_submitted': form_submitted,
-                              }, context_instance=RequestContext(request), )
+    return render(request, 'dnd/rulebooks/rulebook_list.html',
+      context = {'rulebook_list': paginator.items(), 'paginator': paginator,
+                 'filter': f, 'form_submitted': form_submitted,})
+
 
 @menu_item(MenuItem.RULEBOOKS)
 @submenu_item(MenuItem.Rulebooks.EDITIONS)
@@ -35,12 +29,8 @@ def edition_list(request):
 
     paginator = DndPaginator(edition_list, request)
 
-    return render_to_response('dnd/rulebooks/edition_list.html',
-                              {
-                                  'edition_list': paginator.items(),
-                                  'paginator': paginator,
-                                  'request': request,
-                              }, context_instance=RequestContext(request), )
+    return render(request, 'dnd/rulebooks/edition_list.html', context= {
+      'edition_list': paginator.items(), 'paginator': paginator,},)
 
 
 @menu_item(MenuItem.RULEBOOKS)
@@ -67,16 +57,10 @@ def edition_detail(request, edition_slug, edition_id):
     elif dnd_edition.slug == "forgotten-realms-35":
         request.submenu_item = MenuItem.Rulebooks.FORGOTTEN_REALMS_3_5
 
-    return render_to_response('dnd/rulebooks/edition_detail.html',
-                              {
-                                  'dnd_edition': dnd_edition,
-                                  'request': request,
-                                  'rulebook_list': paginator.items(),
-                                  'paginator': paginator,
-                                  'i_like_it_url': request.build_absolute_uri(),
-                                  'inaccurate_url': request.build_absolute_uri(),
-                                  'display_3e_warning': is_3e_edition(dnd_edition),
-                              }, context_instance=RequestContext(request), )
+    return render(request, 'dnd/rulebooks/edition_detail.html', context={
+      'dnd_edition': dnd_edition, 'rulebook_list': paginator.items(), 'paginator': paginator,
+      'i_like_it_url': request.build_absolute_uri(), 'inaccurate_url': request.build_absolute_uri(),
+      'display_3e_warning': is_3e_edition(dnd_edition)},)
 
 
 @menu_item(MenuItem.RULEBOOKS)
@@ -84,7 +68,7 @@ def edition_detail(request, edition_slug, edition_id):
 def rulebook_detail(request, edition_slug, edition_id, rulebook_slug, rulebook_id):
     rulebook = get_object_or_404(Rulebook, id=rulebook_id)
     if (rulebook.slug != rulebook_slug or
-                unicode(rulebook.dnd_edition.id) != edition_id or
+                str(rulebook.dnd_edition.id) != edition_id or
                 rulebook.dnd_edition.slug != edition_slug):
         return permanent_redirect_object(request, rulebook)
 
@@ -101,12 +85,7 @@ def rulebook_detail(request, edition_slug, edition_id, rulebook_slug, rulebook_i
     elif rulebook.dnd_edition.slug == "forgotten-realms-35":
         request.submenu_item = MenuItem.Rulebooks.FORGOTTEN_REALMS_3_5
 
-    return render_to_response('dnd/rulebooks/rulebook_detail.html',
-                              {
-                                  'rulebook': rulebook,
-                                  'dnd_edition': rulebook.dnd_edition,
-                                  'request': request,
-                                  'i_like_it_url': request.build_absolute_uri(),
-                                  'inaccurate_url': request.build_absolute_uri(),
-                                  'display_3e_warning': is_3e_edition(rulebook.dnd_edition),
-                              }, context_instance=RequestContext(request), )
+    return render(request, 'dnd/rulebooks/rulebook_detail.html', context=
+      {'rulebook': rulebook, 'dnd_edition': rulebook.dnd_edition,
+      'i_like_it_url': request.build_absolute_uri(), 'inaccurate_url': request.build_absolute_uri(),
+      'display_3e_warning': is_3e_edition(rulebook.dnd_edition),})

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import re
 from django.utils.html import escape
 import textile
@@ -72,7 +71,7 @@ def update_html_cache_attributes(object, *args):
 def int_with_commas(x):
     if type(x) == (type(0.0)):
         x = int(x)
-    if type(x) not in [type(0), type(0L)]:
+    if type(x) not in [type(0)]:
         raise TypeError("Parameter must be an integer, got %s" % type(x).__name__)
     if x < 0:
         return '-' + int_with_commas(-x)

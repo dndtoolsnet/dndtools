@@ -237,28 +237,6 @@ ul#menu li.selected a, ul#menu li.selected a:hover {
     background-color: #1C2C3E;
 }
 
-ul#menu li.android {
-    float: right;
-}
-
-ul#menu li.android a {
-    background: url('android.png') no-repeat center;
-    width: 52px;
-    height: 52px;
-    padding: 0;
-    color: transparent;
-    overflow: hidden;
-}
-
-ul#menu li.android.selected a, ul#menu li.android.selected a:hover {
-    background: url('android-selected.png') no-repeat center;
-    color: transparent;
-}
-
-ul#menu li.android.arrow a, ul#menu li.android.arrow a:hover {
-    background: url('android-arrow.png') no-repeat center;
-}
-
 ul#menu li.arrow a {
     background-image: url(up-arrow.png);
     background-position: bottom center;

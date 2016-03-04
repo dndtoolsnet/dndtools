@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from dnd.menu import MenuItem
 from dnd.models import NewsEntry
 

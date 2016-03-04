@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 from django.db.models import Q
-from django.shortcuts import get_object_or_404, render_to_response
-from django.template.context import RequestContext
+from django.shortcuts import get_object_or_404, render
 from dnd.menu import menu_item, submenu_item, MenuItem
 from dnd.dnd_paginator import DndPaginator
 from dnd.filters import LanguageFilter
@@ -17,14 +15,8 @@ def language_index(request):
 
     form_submitted = 1 if '_filter' in request.GET else 0
 
-    return render_to_response('dnd/languages/language_index.html',
-                              {
-                                  'request': request,
-                                  'language_list': paginator.items(),
-                                  'paginator': paginator,
-                                  'filter': f,
-                                  'form_submitted': form_submitted,
-                              }, context_instance=RequestContext(request), )
+    return render(request, 'dnd/languages/language_index.html', context={'language_list': paginator.items(),
+      'paginator': paginator, 'filter': f, 'form_submitted': form_submitted,},)
 
 
 @menu_item(MenuItem.CHARACTER_OPTIONS)
@@ -40,11 +32,6 @@ def language_detail(request, language_slug):
 
     paginator = DndPaginator(race_list, request)
 
-    return render_to_response('dnd/languages/language_detail.html',
-                              {
-                                  'language': language,
-                                  'paginator': paginator,
-                                  'race_list': race_list,
-                                  'i_like_it_url': request.build_absolute_uri(),
-                                  'inaccurate_url': request.build_absolute_uri(),
-                              }, context_instance=RequestContext(request), )
+    return render(request, 'dnd/languages/language_detail.html', context={'language': language,
+      'paginator': paginator, 'race_list': race_list, 'i_like_it_url': request.build_absolute_uri(),
+      'inaccurate_url': request.build_absolute_uri(),},)

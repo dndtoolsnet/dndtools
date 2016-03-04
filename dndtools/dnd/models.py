@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from PIL import Image
 from django.contrib.auth.models import User
 from django.db import models
@@ -30,7 +28,7 @@ class DndEdition(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return (
-            'edition_detail', (),
+            'dnd:rulebooks:edition_detail', (),
             {
                 'edition_slug': self.slug,
                 'edition_id': self.id,
@@ -40,7 +38,7 @@ class DndEdition(models.Model):
     @models.permalink
     def get_absolute_url_mobile(self):
         return (
-            'edition_detail_mobile', (),
+            'dnd:mobile:rulebooks:edition_detail_mobile', (),
             {
                 'edition_slug': self.slug,
                 'edition_id': self.id,
@@ -96,7 +94,7 @@ class Rulebook(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return (
-            'rulebook_detail', (),
+            'dnd:rulebooks:rulebook_detail', (),
             {
                 'edition_slug': self.dnd_edition.slug,
                 'edition_id': self.dnd_edition.id,
@@ -108,7 +106,7 @@ class Rulebook(models.Model):
     @models.permalink
     def get_absolute_url_mobile(self):
         return (
-            'rulebook_detail_mobile', (),
+            'dnd:mobile:rulebooks:rulebook_detail_mobile', (),
             {
                 'edition_slug': self.dnd_edition.slug,
                 'edition_id': self.dnd_edition.id,
@@ -151,7 +149,7 @@ class CharacterClass(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return (
-            'character_class_detail', (),
+            'dnd:character_classes:character_class_detail', (),
             {
                 'character_class_slug': self.slug,
             }
@@ -160,7 +158,7 @@ class CharacterClass(models.Model):
     @models.permalink
     def get_absolute_url_mobile(self):
         return (
-            'character_class_detail_mobile', (),
+            'dnd:mobile:character_classes:character_class_detail_mobile', (),
             {
                 'character_class_slug': self.slug,
             }
@@ -169,7 +167,7 @@ class CharacterClass(models.Model):
 
 class CharacterClassVariant(models.Model):
     character_class = models.ForeignKey(
-        CharacterClass,
+        CharacterClass, related_name='variant'
     )
     rulebook = models.ForeignKey(
         Rulebook,
@@ -247,7 +245,7 @@ class CharacterClassVariant(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return (
-            'character_class_variant_detail', (),
+            'dnd:character_classes:character_class_variant_detail', (),
             {
                 'rulebook_slug': self.rulebook.slug,
                 'rulebook_id': self.rulebook.id,
@@ -258,7 +256,7 @@ class CharacterClassVariant(models.Model):
     @models.permalink
     def get_absolute_url_mobile(self):
         return (
-            'character_class_variant_detail_mobile', (),
+            'dnd:mobile:character_classes:character_class_variant_detail_mobile', (),
             {
                 'rulebook_slug': self.rulebook.slug,
                 'rulebook_id': self.rulebook.id,
@@ -397,7 +395,7 @@ class Deity(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return (
-            'deity_detail', (),
+            'dnd:deities:deity_detail', (),
             {
                 'deity_slug': self.slug,
             }
@@ -406,7 +404,7 @@ class Deity(models.Model):
     @models.permalink
     def get_absolute_url_mobile(self):
         return (
-            'deity_detail_mobile', (),
+            'dnd:mobile:deities:deity_detail_mobile', (),
             {
                 'deity_slug': self.slug,
             }
@@ -432,7 +430,7 @@ class Domain(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return (
-            'spell_domain_detail', (),
+            'dnd:spells:spell_domain_detail', (),
             {
                 'spell_domain_slug': self.slug,
             }
@@ -441,7 +439,7 @@ class Domain(models.Model):
     @models.permalink
     def get_absolute_url_mobile(self):
         return (
-            'spell_domain_detail_mobile', (),
+            'dnd:mobile:spells:spell_domain_detail_mobile', (),
             {
                 'spell_domain_slug': self.slug,
             }
@@ -450,7 +448,7 @@ class Domain(models.Model):
 
 class DomainVariant(models.Model):
     domain = models.ForeignKey(
-        Domain,
+        Domain, related_name='variant'
     )
 
     rulebook = models.ForeignKey(
@@ -506,7 +504,7 @@ class DomainVariant(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return (
-            'spell_variant_domain_detail', (),
+            'dnd:spells:spell_variant_domain_detail', (),
             {
                 'rulebook_slug': self.rulebook.slug,
                 'rulebook_id': self.rulebook.id,
@@ -517,7 +515,7 @@ class DomainVariant(models.Model):
     @models.permalink
     def get_absolute_url_mobile(self):
         return (
-            'spell_variant_domain_detail_mobile', (),
+            'dnd:mobile:spells:spell_variant_domain_detail_mobile', (),
             {
                 'rulebook_slug': self.rulebook.slug,
                 'rulebook_id': self.rulebook.id,
@@ -546,7 +544,7 @@ class SpellDescriptor(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return (
-            'spell_descriptor_detail', (),
+            'dnd:spells:spell_descriptor_detail', (),
             {
                 'spell_descriptor_slug': self.slug,
             }
@@ -555,7 +553,7 @@ class SpellDescriptor(models.Model):
     @models.permalink
     def get_absolute_url_mobile(self):
         return (
-            'spell_descriptor_detail_mobile', (),
+            'dnd:mobile:spells:spell_descriptor_detail_mobile', (),
             {
                 'spell_descriptor_slug': self.slug,
             }
@@ -581,7 +579,7 @@ class SpellSchool(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return (
-            'spell_school_detail', (),
+            'dnd:spells:spell_school_detail', (),
             {
                 'spell_school_slug': self.slug,
             }
@@ -590,7 +588,7 @@ class SpellSchool(models.Model):
     @models.permalink
     def get_absolute_url_mobile(self):
         return (
-            'spell_school_detail_mobile', (),
+            'dnd:mobile:spells:spell_school_detail_mobile', (),
             {
                 'spell_school_slug': self.slug,
             }
@@ -616,7 +614,7 @@ class SpellSubSchool(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return (
-            'spell_sub_school_detail', (),
+            'dnd:spells:spell_sub_school_detail', (),
             {
                 'spell_sub_school_slug': self.slug,
             }
@@ -625,7 +623,7 @@ class SpellSubSchool(models.Model):
     @models.permalink
     def get_absolute_url_mobile(self):
         return (
-            'spell_sub_school_detail_mobile', (),
+            'dnd:mobile:spells:spell_sub_school_detail_mobile', (),
             {
                 'spell_sub_school_slug': self.slug,
             }
@@ -773,7 +771,7 @@ class Spell(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return (
-            'spell_detail', (),
+            'dnd:spells:spell_detail', (),
             {
                 'spell_slug': self.slug,
                 'spell_id': self.id,
@@ -785,7 +783,7 @@ class Spell(models.Model):
     @models.permalink
     def get_absolute_url_mobile(self):
         return (
-            'spell_detail_mobile', (),
+            'dnd:mobile:spells:spell_detail_mobile', (),
             {
                 'spell_slug': self.slug,
                 'spell_id': self.id,
@@ -851,7 +849,7 @@ class FeatCategory(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return (
-            'feat_category_detail', (),
+            'dnd:feats:feat_category_detail', (),
             {
                 'category_slug': self.slug,
             }
@@ -860,7 +858,7 @@ class FeatCategory(models.Model):
     @models.permalink
     def get_absolute_url_mobile(self):
         return (
-            'feat_category_detail_mobile', (),
+            'dnd:mobile:feats:feat_category_detail_mobile', (),
             {
                 'category_slug': self.slug,
             }
@@ -898,7 +896,7 @@ class Skill(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return (
-            'skill_detail', (),
+            'dnd:skills:skill_detail', (),
             {
                 'skill_slug': self.slug,
             }
@@ -907,7 +905,7 @@ class Skill(models.Model):
     @models.permalink
     def get_absolute_url_mobile(self):
         return (
-            'skill_detail_mobile', (),
+            'dnd:mobile:skills:skill_detail_mobile', (),
             {
                 'skill_slug': self.slug,
             }
@@ -916,7 +914,7 @@ class Skill(models.Model):
 
 class SkillVariant(models.Model):
     skill = models.ForeignKey(
-        Skill,
+        Skill, related_name='skill_variants'
     )
     rulebook = models.ForeignKey(
         Rulebook,
@@ -1012,7 +1010,7 @@ class SkillVariant(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return (
-            'skill_variant_detail', (),
+            'dnd:skills:skill_variant_detail', (),
             {
                 'rulebook_slug': self.rulebook.slug,
                 'rulebook_id': self.rulebook.id,
@@ -1023,7 +1021,7 @@ class SkillVariant(models.Model):
     @models.permalink
     def get_absolute_url_mobile(self):
         return (
-            'skill_variant_detail_mobile', (),
+            'dnd:mobile:skills:skill_variant_detail_mobile', (),
             {
                 'rulebook_slug': self.rulebook.slug,
                 'rulebook_id': self.rulebook.id,
@@ -1120,7 +1118,7 @@ class Feat(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return (
-            'feat_detail', (),
+            'dnd:feats:feat_detail', (),
             {
                 'feat_slug': self.slug,
                 'feat_id': self.id,
@@ -1132,7 +1130,7 @@ class Feat(models.Model):
     @models.permalink
     def get_absolute_url_mobile(self):
         return (
-            'feat_detail_mobile', (),
+            'dnd:mobile:feats:feat_detail_mobile', (),
             {
                 'feat_slug': self.slug,
                 'feat_id': self.id,
@@ -1249,7 +1247,7 @@ class Language(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return (
-            'language_detail', (),
+            'dnd:languages:language_detail', (),
             {
                 'language_slug': self.slug,
             }
@@ -1258,7 +1256,7 @@ class Language(models.Model):
     @models.permalink
     def get_absolute_url_mobile(self):
         return (
-            'language_detail_mobile', (),
+            'dnd:mobile:languages:language_detail_mobile', (),
             {
                 'language_slug': self.slug,
             }
@@ -1338,7 +1336,7 @@ class MonsterType(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return (
-            'monster_type_detail', (),
+            'dnd:monsters:monster_type_detail', (),
             {
                 'slug': self.slug,
             }
@@ -1347,7 +1345,7 @@ class MonsterType(models.Model):
     @models.permalink
     def get_absolute_url_mobile(self):
         return (
-            'monster_type_detail_mobile', (),
+            'dnd:mobile:monsters:monster_type_detail_mobile', (),
             {
                 'slug': self.slug,
             }
@@ -1373,7 +1371,7 @@ class MonsterSubtype(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return (
-            'monster_subtype_detail', (),
+            'dnd:monsters:monster_subtype_detail', (),
             {
                 'slug': self.slug,
             }
@@ -1382,7 +1380,7 @@ class MonsterSubtype(models.Model):
     @models.permalink
     def get_absolute_url_mobile(self):
         return (
-            'monster_subtype_detail_mobile', (),
+            'dnd:mobile:monsters:monster_subtype_detail_mobile', (),
             {
                 'slug': self.slug,
             }
@@ -1571,7 +1569,7 @@ class Monster(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return (
-            'monster_detail', (),
+            'dnd:monsters:monster_detail', (),
             {
                 'monster_slug': self.slug,
                 'monster_id': self.id,
@@ -1583,7 +1581,7 @@ class Monster(models.Model):
     @models.permalink
     def get_absolute_url_mobile(self):
         return (
-            'monster_detail_mobile', (),
+            'dnd:mobile:monsters:monster_detail_mobile', (),
             {
                 'monster_slug': self.slug,
                 'monster_id': self.id,
@@ -1702,7 +1700,7 @@ class RaceType(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return (
-            'race_type_detail', (),
+            'dnd:races:race_type_detail', (),
             {
                 'race_type_slug': self.slug,
             }
@@ -1711,7 +1709,7 @@ class RaceType(models.Model):
     @models.permalink
     def get_absolute_url_mobile(self):
         return (
-            'race_type_detail_mobile', (),
+            'dnd:mobile:races:race_type_detail_mobile', (),
             {
                 'race_type_slug': self.slug,
             }
@@ -1873,7 +1871,7 @@ class Race(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return (
-            'race_detail', (),
+            'dnd:races:race_detail', (),
             {
                 'race_slug': self.slug,
                 'race_id': self.id,
@@ -1885,7 +1883,7 @@ class Race(models.Model):
     @models.permalink
     def get_absolute_url_mobile(self):
         return (
-            'race_detail_mobile', (),
+            'dnd:mobile:races:race_detail_mobile', (),
             {
                 'race_slug': self.slug,
                 'race_id': self.id,
@@ -2167,7 +2165,7 @@ class Item(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return (
-            'item_detail', (),
+            'dnd:items:item_detail', (),
             {
                 'item_slug': self.slug,
                 'item_id': self.id,
@@ -2179,7 +2177,7 @@ class Item(models.Model):
     @models.permalink
     def get_absolute_url_mobile(self):
         return (
-            'item_detail_mobile', (),
+            'dnd:mobile:items:item_detail_mobile', (),
             {
                 'item_slug': self.slug,
                 'item_id': self.id,
@@ -2292,7 +2290,7 @@ class Rule(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return (
-            'rule_detail', (),
+            'dnd:rules:rule_detail', (),
             {
                 'rule_slug': self.slug,
                 'rule_id': self.id,
@@ -2304,7 +2302,7 @@ class Rule(models.Model):
     @models.permalink
     def get_absolute_url_mobile(self):
         return (
-            'rule_detail_mobile', (),
+            'dnd:mobile:rules:rule_detail_mobile', (),
             {
                 'rule_slug': self.slug,
                 'rule_id': self.id,

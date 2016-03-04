@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 
 class MenuItem:
     def __init__(self):
@@ -85,12 +83,6 @@ class MenuItem:
         NEWS = "news"
         CONTACT_US = "contact_us"
         STAFF = "staff"
-
-    ANDROID = "android"
-
-    class Android:
-        def __init__(self):
-            pass
 
 
 def menu_item(menu_item_name):

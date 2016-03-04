@@ -5,8 +5,8 @@
 {% block title %}{{ monster.name }} &ndash; Monster{% endblock %}
 
 {% block breadcrumbs %}
-    &raquo; <a href="{% url 'monster_index'  %}">Monsters</a>
-    &raquo; <a href="{% url 'monsters_in_rulebook' rulebook_slug=rulebook.slug rulebook_id=rulebook.id  %}">{{ rulebook.name }}</a> (
+    &raquo; <a href="{% url 'dnd:monsters:monster_index'  %}">Monsters</a>
+    &raquo; <a href="{% url 'dnd:monsters:monsters_in_rulebook' rulebook_slug=rulebook.slug rulebook_id=rulebook.id  %}">{{ rulebook.name }}</a> (
     <a href="{{ rulebook.get_absolute_url }}">book</a>)
     &raquo; <a href="{{ monster.get_absolute_url }}">{{ monster.name }}</a>
 {% endblock %}
@@ -23,7 +23,7 @@
 
     <div class="close-paragraphs">
         <p>
-            <strong>{{ monster.size }} {{ monster.type.name }}
+            <strong>{{ monster.size.name }} {{ monster.type.name }}
                 {% if monster_subtypes %}
                     ({% for subtype in monster_subtypes %}{% if not forloop.first %}
                     , {% endif %}{{ subtype.name }}{% endfor %})

@@ -28,12 +28,12 @@
             <td>
                {# both? Well, display both #}
                 {% if item.body_slot and item.property %}
-                    {{ item.body_slot }}/{{ item.property }}
+                    {{ item.body_slot.name }}/{{ item.property.name }}
                 {% else %}
                     {% if item.body_slot %}
-                        {{ item.body_slot }}
+                        {{ item.body_slot.name }}
                     {% else %}
-                        {{ item.property|empty_as_dash }}
+                        {{ item.property.name|empty_as_dash }}
                     {% endif %}
                 {% endif %}
             </td>

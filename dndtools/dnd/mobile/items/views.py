@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
 from math import ceil
 
-from django.shortcuts import get_object_or_404, render_to_response
-from django.template import RequestContext
+from django.shortcuts import get_object_or_404, render
 from dnd.menu import menu_item, submenu_item
 from dnd.mobile.views import permanent_redirect_object_mobile
 from dnd.utilities import int_with_commas
@@ -22,14 +20,8 @@ def item_index_mobile(request):
 
     form_submitted = 1 if '_filter' in request.GET else 0
 
-    return render_to_response('dnd/mobile/items/item_index.html',
-                              {
-                                  'request': request,
-                                  'item_list': paginator.items(),
-                                  'paginator': paginator,
-                                  'filter': f,
-                                  'form_submitted': form_submitted,
-                              }, context_instance=RequestContext(request), )
+    return render(request, 'dnd/mobile/items/item_index.html', context={'item_list': paginator.items(),
+      'paginator': paginator, 'filter': f, 'form_submitted': form_submitted,},)
 
 
 @menu_item("items")
@@ -39,12 +31,8 @@ def item_list_by_rulebook_mobile(request):
 
     paginator = DndMobilePaginator(rulebook_list, request)
 
-    return render_to_response('dnd/mobile/items/item_list_by_rulebook.html',
-                              {
-                                  'request': request,
-                                  'rulebook_list': paginator.items(),
-                                  'paginator': paginator,
-                              }, context_instance=RequestContext(request), )
+    return render(request, 'dnd/mobile/items/item_list_by_rulebook.html', context=
+      {'rulebook_list': paginator.items(), 'paginator': paginator,},)
 
 
 @menu_item("items")
@@ -52,37 +40,33 @@ def item_list_by_rulebook_mobile(request):
 def items_in_rulebook_mobile(request, rulebook_slug, rulebook_id):
     rulebook = get_object_or_404(Rulebook, pk=rulebook_id)
     if not rulebook.slug == rulebook_slug:
-        return permanent_redirect_view(request, items_in_rulebook_mobile,
+        return permanent_redirect_view(request, 'dnd:mobile:items:items_in_rulebook_mobile',
                                        kwargs={
                                            'rulebook_slug': rulebook.slug,
                                            'rulebook_id': rulebook_id, })
 
     item_list = rulebook.item_set.select_related(
-        'rulebook', 'rulebook__dnd_edition', 'school').all()
+        'rulebook', 'rulebook__dnd_edition').all()
 
     paginator = DndMobilePaginator(item_list, request)
 
-    return render_to_response('dnd/mobile/items/items_in_rulebook.html',
-                              {
-                                  'rulebook': rulebook,
-                                  'item_list': paginator.items(),
-                                  'paginator': paginator,
-                                  'request': request,
-                                  'display_3e_warning': is_3e_edition(rulebook.dnd_edition),
-                              }, context_instance=RequestContext(request), )
+    return render(request, 'dnd/mobile/items/items_in_rulebook.html', context=
+      {'rulebook': rulebook, 'item_list': paginator.items(), 'paginator': paginator,
+       'display_3e_warning': is_3e_edition(rulebook.dnd_edition),},)
 
 
 @menu_item("items")
 @submenu_item("items")
 def item_detail_mobile(request, rulebook_slug, rulebook_id, item_slug, item_id):
     item = get_object_or_404(Item.objects.select_related(
-        'rulebook', 'rulebook__dnd_edition', 'body_slot', 'aura', 'spellschool_set',
-        'activation', 'required_feats', 'required_spells', 'property', 'synergy_prerequisite',
-    ), pk=item_id)
+        'rulebook', 'rulebook__dnd_edition', 'body_slot', 'aura',
+        'activation', 'property', 'synergy_prerequisite',
+    ).prefetch_related('aura_schools', 'required_feats', 'required_spells'),
+    pk=item_id)
     assert isinstance(item, Item)
 
     if (item.slug != item_slug or
-                unicode(item.rulebook.id) != rulebook_id or
+                str(item.rulebook.id) != rulebook_id or
                 item.rulebook.slug != rulebook_slug):
         return permanent_redirect_object_mobile(request, item)
 
@@ -99,19 +83,9 @@ def item_detail_mobile(request, rulebook_slug, rulebook_id, item_slug, item_id):
         elif not item.price_gp and item.price_bonus:
             cost_to_create = "Varies"
 
-    return render_to_response('dnd/mobile/items/item_detail.html',
-                              {
-                                  'item': item,
-                                  'aura_schools': item.aura_schools.all(),
-                                  'required_feats': required_feats,
-                                  'required_spells': required_spells,
-                                  'cost_to_create': cost_to_create,
-                                  'rulebook': item.rulebook,
-                                  'request': request,
-                                  # enum
-                                  'ItemType': Item.ItemType,
-                                  'i_like_it_url': request.build_absolute_uri(),
-                                  'inaccurate_url': request.build_absolute_uri(),
-                                  'display_3e_warning': is_3e_edition(item.rulebook.dnd_edition),
-                              },
-                              context_instance=RequestContext(request), )
+    return render(request, 'dnd/mobile/items/item_detail.html', context={'item': item,
+      'aura_schools': item.aura_schools.all(), 'required_feats': required_feats,
+      'required_spells': required_spells, 'cost_to_create': cost_to_create, 'rulebook': item.rulebook,
+      'ItemType': Item.ItemType, 'i_like_it_url': request.build_absolute_uri(),
+      'inaccurate_url': request.build_absolute_uri(), 'display_3e_warning': is_3e_edition(item.rulebook.dnd_edition),},)
+    

@@ -6,9 +6,9 @@
 {% block title %}{{ race.name }} &ndash; Race{% endblock %}
 
 {% block breadcrumbs %}
-    &raquo; <a href="{% url 'race_index'  %}">Races</a>
+    &raquo; <a href="{% url 'dnd:races:race_index'  %}">Races</a>
     &raquo; <a
-        href="{% url 'races_in_rulebook' rulebook_slug=rulebook.slug rulebook_id=rulebook.id  %}">{{ rulebook.name }}</a> (
+        href="{% url 'dnd:races:races_in_rulebook' rulebook_slug=rulebook.slug rulebook_id=rulebook.id  %}">{{ rulebook.name }}</a> (
     <a href="{{ rulebook.get_absolute_url }}">book</a>)
     &raquo; <a href="{{ race.get_absolute_url }}">{{ race.name }}</a>
 {% endblock %}
@@ -29,10 +29,18 @@
     <h3>Attributes</h3>
 
     <table class="race-attributes">
+        {% if not race.racial_hit_dice_count and race.race_type %}
+        <tr>
+            <th>Type:</th>
+            <td>
+                <a href="{{ race.race_type.get_absolute_url }}">{{ race.race_type.name }}</a>
+            </td>
+        </tr>
+        {% endif %}
         <tr>
             <th>Size:</th>
             <td>
-                {{ race.size }}
+                {{ race.size.name }}
             </td>
         </tr>
         <tr>
@@ -40,7 +48,7 @@
             <td>
                 {% for speed in race_speeds %}
                     {% if not forloop.first %}, {% endif %}
-                    {{ speed.type }} {{ speed.speed }}
+                    {{ speed.type.name }} {{ speed.speed }}
                 {% endfor %}
             </td>
         </tr>

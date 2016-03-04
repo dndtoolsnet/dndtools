@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
-from django.shortcuts import render_to_response, get_object_or_404
-from django.template import RequestContext
+from django.shortcuts import render, get_object_or_404
 from dnd.menu import menu_item, submenu_item
 from dnd.filters import SkillFilter
 from dnd.mobile.dnd_paginator import DndMobilePaginator
@@ -18,14 +16,8 @@ def skill_list_mobile(request):
 
     paginator = DndMobilePaginator(f.qs, request)
 
-    return render_to_response('dnd/mobile/skills/skill_list.html',
-                              {
-                                  'request': request,
-                                  'skill_list': paginator.items(),
-                                  'paginator': paginator,
-                                  'filter': f,
-                                  'form_submitted': form_submitted,
-                              }, context_instance=RequestContext(request), )
+    return render(request, 'dnd/mobile/skills/skill_list.html', context={'skill_list': paginator.items(),
+      'paginator': paginator, 'filter': f, 'form_submitted': form_submitted,},)
 
 
 @menu_item("skills")
@@ -33,12 +25,11 @@ def skill_list_mobile(request):
 def skill_detail_mobile(request, skill_slug, rulebook_slug=None,
                         rulebook_id=None):
     # fetch the class
-    skill = get_object_or_404(Skill.objects.select_related(
-        'skill_variant', 'skill_variant__rulebook'), slug=skill_slug)
+    skill = get_object_or_404(Skill.objects, slug=skill_slug)
 
     # fetch primary variant, this is independent of rulebook selected
     try:
-        primary_variant = SkillVariant.objects.select_related(
+        primary_variant = SkillVariant.objects.prefetch_related(
             'rulebook', 'rulebook__dnd_edition',
         ).filter(
             skill=skill,
@@ -51,7 +42,7 @@ def skill_detail_mobile(request, skill_slug, rulebook_slug=None,
         # use canonical link in head as this is more or less duplicated content
         use_canonical_link = True
         selected_variant = get_object_or_404(
-            SkillVariant.objects.select_related(
+            SkillVariant.objects.prefetch_related(
                 'rulebook', 'skill', 'rulebook__dnd_edition'),
             skill__slug=skill_slug,
             rulebook__pk=rulebook_id)
@@ -63,7 +54,7 @@ def skill_detail_mobile(request, skill_slug, rulebook_slug=None,
         # selected variant is primary! Redirect to canonical url
         if selected_variant == primary_variant:
             return permanent_redirect_view(
-                request, skill_detail_mobile, kwargs={
+                request, 'dnd:mobile:skills:skill_detail_mobile', kwargs={
                     'skill_slug': skill_slug}
             )
     else:
@@ -74,7 +65,7 @@ def skill_detail_mobile(request, skill_slug, rulebook_slug=None,
     other_variants = [
         variant
         for variant
-        in skill.skillvariant_set.select_related(
+        in skill.skill_variants.prefetch_related(
             'rulebook', 'rulebook__dnd_edition', 'skill').all()
         if variant != selected_variant
     ]
@@ -87,19 +78,11 @@ def skill_detail_mobile(request, skill_slug, rulebook_slug=None,
     feat_list = skill.required_by_feats.select_related('rulebook').all()
     feat_paginator = DndMobilePaginator(feat_list, request)
 
-    return render_to_response('dnd/mobile/skills/skill_detail.html',
-                              {
-                                  'skill': skill,
-                                  'feat_list': feat_paginator.items(),
-                                  'feat_paginator': feat_paginator,
-                                  'request': request,
-                                  'i_like_it_url': request.build_absolute_uri(),
-                                  'inaccurate_url': request.build_absolute_uri(),
-                                  'selected_variant': selected_variant,
-                                  'other_variants': other_variants,
-                                  'use_canonical_link': use_canonical_link,
-                                  'display_3e_warning': display_3e_warning,
-                              }, context_instance=RequestContext(request), )
+    return render(request, 'dnd/mobile/skills/skill_detail.html', context={'skill': skill,
+      'feat_list': feat_paginator.items(), 'feat_paginator': feat_paginator,
+      'i_like_it_url': request.build_absolute_uri(), 'inaccurate_url': request.build_absolute_uri(),
+      'selected_variant': selected_variant, 'other_variants': other_variants,
+      'use_canonical_link': use_canonical_link, 'display_3e_warning': display_3e_warning,},)
 
 
 @menu_item("skills")
@@ -109,12 +92,8 @@ def skills_list_by_rulebook_mobile(request):
 
     paginator = DndMobilePaginator(rulebook_list, request)
 
-    return render_to_response('dnd/mobile/skills/skills_list_by_rulebook.html',
-                              {
-                                  'request': request,
-                                  'rulebook_list': paginator.items(),
-                                  'paginator': paginator,
-                              }, context_instance=RequestContext(request), )
+    return render(request, 'dnd/mobile/skills/skills_list_by_rulebook.html', context=
+      {'rulebook_list': paginator.items(), 'paginator': paginator,},)
 
 
 @menu_item("skills")
@@ -122,7 +101,7 @@ def skills_list_by_rulebook_mobile(request):
 def skills_in_rulebook_mobile(request, rulebook_slug, rulebook_id):
     rulebook = get_object_or_404(Rulebook, pk=rulebook_id)
     if not rulebook.slug == rulebook_slug:
-        return permanent_redirect_view(request, skills_in_rulebook_mobile,
+        return permanent_redirect_view(request, 'dnd:mobile:skills:skills_in_rulebook_mobile',
                                        kwargs={
                                            'rulebook_slug': rulebook.slug,
                                            'rulebook_id': rulebook_id, })
@@ -133,10 +112,6 @@ def skills_in_rulebook_mobile(request, rulebook_slug, rulebook_id):
         in rulebook.skillvariant_set.all()
     ]
 
-    return render_to_response('dnd/mobile/skills/skill_in_rulebook.html',
-                              {
-                                  'rulebook': rulebook,
-                                  'skill_list': skill_list,
-                                  'request': request,
-                                  'display_3e_warning': is_3e_edition(rulebook.dnd_edition),
-                              }, context_instance=RequestContext(request), )
+    return render(request, 'dnd/mobile/skills/skill_in_rulebook.html', context=
+      {'rulebook': rulebook, 'skill_list': skill_list, 'display_3e_warning': is_3e_edition(rulebook.dnd_edition),},)
+    

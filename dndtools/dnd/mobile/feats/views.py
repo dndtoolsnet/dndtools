@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-
-from django.shortcuts import get_object_or_404, render_to_response
-from django.template import RequestContext
+from django.shortcuts import get_object_or_404, render
 from dnd.menu import menu_item, submenu_item
 from dnd.mobile.views import permanent_redirect_object_mobile
 from dnd.mobile.dnd_paginator import DndMobilePaginator
@@ -20,14 +17,8 @@ def feat_index_mobile(request):
 
     paginator = DndMobilePaginator(f.qs, request)
 
-    return render_to_response('dnd/mobile/feats/feat_index.html',
-                              {
-                                  'request': request,
-                                  'feat_list': paginator.items(),
-                                  'paginator': paginator,
-                                  'filter': f,
-                                  'form_submitted': form_submitted,
-                              }, context_instance=RequestContext(request), )
+    return render(request, 'dnd/mobile/feats/feat_index.html', context={'feat_list': paginator.items(),
+      'paginator': paginator, 'filter': f, 'form_submitted': form_submitted,},)
 
 
 @menu_item("feats")
@@ -37,11 +28,8 @@ def feat_category_list_mobile(request):
 
     paginator = DndMobilePaginator(feat_category_list, request)
 
-    return render_to_response('dnd/mobile/feats/feat_category_list.html',
-                              {
-                                  'feat_category_list': paginator.items(),
-                                  'paginator': paginator,
-                                  'request': request, }, context_instance=RequestContext(request), )
+    return render(request, 'dnd/mobile/feats/feat_category_list.html', context=
+      {'feat_category_list': paginator.items(), 'paginator': paginator,},)
 
 
 @menu_item("feats")
@@ -53,15 +41,9 @@ def feat_category_detail_mobile(request, category_slug):
 
     paginator = DndMobilePaginator(feat_list, request)
 
-    return render_to_response('dnd/mobile/feats/feat_category_detail.html',
-                              {
-                                  'feat_category': feat_category,
-                                  'feat_list': paginator.items(),
-                                  'paginator': paginator,
-                                  'request': request,
-                                  'i_like_it_url': request.build_absolute_uri(),
-                                  'inaccurate_url': request.build_absolute_uri(), },
-                              context_instance=RequestContext(request), )
+    return render(request, 'dnd/mobile/feats/feat_category_detail.html', context=
+      {'feat_category': feat_category, 'feat_list': paginator.items(), 'paginator': paginator,
+       'i_like_it_url': request.build_absolute_uri(), 'inaccurate_url': request.build_absolute_uri(), },)
 
 
 @menu_item("feats")
@@ -80,14 +62,8 @@ def feats_in_rulebook_mobile(request, rulebook_slug, rulebook_id):
 
     paginator = DndMobilePaginator(feat_list, request)
 
-    return render_to_response('dnd/mobile/feats/feats_in_rulebook.html',
-                              {
-                                  'rulebook': rulebook,
-                                  'feat_list': paginator.items(),
-                                  'paginator': paginator,
-                                  'request': request,
-                                  'display_3e_warning': is_3e_edition(rulebook.dnd_edition),
-                              }, context_instance=RequestContext(request), )
+    return render(request, 'dnd/mobile/feats/feats_in_rulebook.html', context={'rulebook': rulebook,
+      'feat_list': paginator.items(), 'paginator': paginator, 'display_3e_warning': is_3e_edition(rulebook.dnd_edition),},)
 
 
 @menu_item("feats")
@@ -97,7 +73,7 @@ def feat_detail_mobile(request, rulebook_slug, rulebook_id, feat_slug, feat_id):
         Feat.objects.select_related('rulebook', 'rulebook__dnd_edition'),
         pk=feat_id)
     if (feat.slug != feat_slug or
-                unicode(feat.rulebook.id) != rulebook_id or
+                str(feat.rulebook.id) != rulebook_id or
                 feat.rulebook.slug != rulebook_slug):
         return permanent_redirect_object_mobile(request, feat)
 
@@ -113,19 +89,9 @@ def feat_detail_mobile(request, rulebook_slug, rulebook_id, feat_slug, feat_id):
     related_feats = Feat.objects.filter(slug=feat.slug).exclude(rulebook__id=feat.rulebook.id).select_related(
         'rulebook', 'rulebook__dnd_edition').all()
 
-    return render_to_response('dnd/mobile/feats/feat_detail.html',
-                              {
-                                  'feat': feat,
-                                  'rulebook': feat.rulebook,
-                                  'feat_category_list': feat_category_list,
-                                  'required_feats': required_feats,
-                                  'required_by_feats': required_by_feats,
-                                  'required_skills': required_skills,
-                                  'special_prerequisities': special_prerequisities,
-                                  'request': request,
-                                  'i_like_it_url': request.build_absolute_uri(),
-                                  'inaccurate_url': request.build_absolute_uri(),
-                                  'display_3e_warning': is_3e_edition(feat.rulebook.dnd_edition),
-                                  'related_feats': related_feats,
-                              }, context_instance=RequestContext(request), )
-
+    return render(request, 'dnd/mobile/feats/feat_detail.html', context={'feat': feat,
+      'rulebook': feat.rulebook, 'feat_category_list': feat_category_list, 'required_feats': required_feats,
+      'required_by_feats': required_by_feats, 'required_skills': required_skills,
+      'special_prerequisities': special_prerequisities, 'i_like_it_url': request.build_absolute_uri(),
+      'inaccurate_url': request.build_absolute_uri(), 'display_3e_warning': is_3e_edition(feat.rulebook.dnd_edition),
+      'related_feats': related_feats,},)
