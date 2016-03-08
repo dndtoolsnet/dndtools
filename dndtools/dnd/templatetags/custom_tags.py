@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
 import os
-import urlparse
+from urllib import parse
 from django import template
 from django.contrib.sites.models import Site
 from django.utils.safestring import mark_safe
-import dndproject.settings
+import dndproject.settings as settings
 
 
 register = template.Library()
@@ -48,12 +47,12 @@ def static(filename, flags=''):
         see http://insist.sk/blog/django/149.html
     """
     flags = set(f.strip() for f in flags.split(','))
-    url = urlparse.urljoin(dndproject.settings.STATIC_URL, filename)
+    url = parse.urljoin(settings.STATIC_URL, filename)
     if 'absolute' in flags:
         url = _absolute_url(url)
     if (filename.endswith('.css') or filename.endswith('.js')) and 'no-timestamp' not in flags or \
        'timestamp' in flags:
-        fullname = os.path.join(dndproject.settings.STATICFILES_DIRS[0], filename)
+        fullname = os.path.join(settings.STATICFILES_DIRS[0], filename)
         if os.path.exists(fullname):
             url += '?%d' % os.path.getmtime(fullname)
     return url
@@ -65,12 +64,12 @@ def media(filename, flags=''):
         see http://insist.sk/blog/django/149.html
     """
     flags = set(f.strip() for f in flags.split(','))
-    url = urlparse.urljoin(dndproject.settings.MEDIA_URL, filename)
+    url = parse.urljoin(settings.MEDIA_URL, filename)
     if 'absolute' in flags:
         url = _absolute_url(url)
     if (filename.endswith('.css') or filename.endswith('.js')) and 'no-timestamp' not in flags or \
        'timestamp' in flags:
-        fullname = os.path.join(dndproject.settings.MEDIA_ROOT, filename)
+        fullname = os.path.join(settings.MEDIA_ROOT, filename)
         if os.path.exists(fullname):
             url += '?%d' % os.path.getmtime(fullname)
     return url

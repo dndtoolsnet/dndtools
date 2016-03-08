@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django import forms
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
@@ -274,6 +273,7 @@ class MonsterForm(forms.ModelForm):
 
     class Meta:
         model = Monster
+        fields = '__all__'
 
 
 class MonsterAdmin(admin.ModelAdmin):

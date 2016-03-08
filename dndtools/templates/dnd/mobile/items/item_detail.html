@@ -52,12 +52,12 @@
     <i>Prerequisites:</i>
     {% for required_feat in required_feats %}
 
-        <a href="{{ required_feat.get_absolute_url_mobile }}">{{ required_feat }}</a>{% if not forloop.last %}, {% endif %}
+        <a href="{{ required_feat.get_absolute_url_mobile }}">{{ required_feat.name }}</a>{% if not forloop.last %}, {% endif %}
     {% endfor %}
     {% if required_feats and required_spells %},{% endif %}
     <i>
     {% for required_spell in required_spells %}
-        <a href="{{ required_spell.get_absolute_url_mobile }}">{{ required_spell }}</a>{% if not forloop.last %}, {% endif %}
+        <a href="{{ required_spell.get_absolute_url_mobile }}">{{ required_spell.name }}</a>{% if not forloop.last %}, {% endif %}
     {% endfor %}
     </i>
     {{ item.required_extra }}.

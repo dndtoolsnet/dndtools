@@ -1,17 +1,15 @@
-# -*- coding: utf-8 -*-
-
 from django.core.mail.message import EmailMessage
 from django.core.urlresolvers import reverse
 from django.http import HttpResponsePermanentRedirect, HttpResponseRedirect
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.template.context import RequestContext
 from dnd.menu import menu_item, submenu_item, MenuItem
 from dnd.forms import InaccurateContentForm
 from dnd.models import NewsEntry
 
 
-def permanent_redirect_view(request, view_name, args=None, kwargs=None):
-    url = reverse(view_name, args=args, kwargs=kwargs)
+def permanent_redirect_view(request, view, args=None, kwargs=None):
+    url = reverse(view, args=args, kwargs=kwargs)
     # get parameters
     if len(request.GET) > 0:
         #noinspection PyUnresolvedReferences
@@ -44,16 +42,17 @@ def is_admin(request):
 def index(request):
     news_entries = NewsEntry.objects.filter(enabled=True).order_by('-published')[:15]
 
-    response = render_to_response('dnd/index.html',
-                                  {
-                                      'request': request, 'news_entries': news_entries,
-                                  },
-                                  context_instance=RequestContext(request), )
+    response = render(request, 'dnd/index.html', context = {'news_entries': news_entries})
 
     if len(news_entries):
         response.set_cookie('top_news', news_entries[0].pk, 10 * 365 * 24 * 60 * 60)
 
     return response
+
+def index(request):
+    news_entries = NewsEntry.objects.filter(enabled=True).order_by('-published')
+    l = list(map(str, news_entries))
+    return render(request, 'dnd/index.html', {'news_entries': news_entries})
 
 
 def inaccurate_content(request):
@@ -104,17 +103,11 @@ def inaccurate_content(request):
                 'url': request.GET.get('url', ''),
             })
 
-    return render_to_response('dnd/inaccurate_content.html',
-                              {
-                                  'request': request,
-                                  'form': form, }, context_instance=RequestContext(request), )
+    return render(request, 'dnd/inaccurate_content.html', {'form': form })
 
 
 def inaccurate_content_sent(request):
-    return render_to_response('dnd/inaccurate_content_sent.html',
-                              {
-                                  'request': request,
-                              }, context_instance=RequestContext(request), )
+    return render(request, 'dnd/inaccurate_content_sent.html')
 
 
 #@revision.create_on_success
@@ -151,10 +144,4 @@ def very_secret_url(request):
     #                print message,
     #                counter += 1
 
-    return render_to_response('dnd/very_secret_url.html',
-                              {
-                                  'request': request,
-                                  'log': log,
-                              }, context_instance=RequestContext(request), )
-
-
+    return render(request, 'dnd/very_secret_url.html', {'log': log})

@@ -4,8 +4,8 @@
 {% block title %}{{ item.name }} &ndash; Item{% endblock %}
 
 {% block breadcrumbs %}
-    &raquo; <a href="{% url 'item_index'  %}">Items</a>
-    &raquo; <a href="{% url 'items_in_rulebook' rulebook_slug=rulebook.slug rulebook_id=rulebook.id  %}">{{ rulebook.name }}</a> (<a href="{{ rulebook.get_absolute_url }}">book</a>)
+    &raquo; <a href="{% url 'dnd:items:item_index'  %}">Items</a>
+    &raquo; <a href="{% url 'dnd:items:items_in_rulebook' rulebook_slug=rulebook.slug rulebook_id=rulebook.id  %}">{{ rulebook.name }}</a> (<a href="{{ rulebook.get_absolute_url }}">book</a>)
     &raquo; <a href="{{ item.get_absolute_url }}">{{ item.name }}</a>
 {% endblock %}
 
@@ -60,12 +60,12 @@
     <i>Prerequisites:</i>
     {% for required_feat in required_feats %}
 
-        <a href="{{ required_feat.get_absolute_url }}">{{ required_feat }}</a>{% if not forloop.last %}, {% endif %}
+        <a href="{{ required_feat.get_absolute_url }}">{{ required_feat.name }}</a>{% if not forloop.last %}, {% endif %}
     {% endfor %}
     {% if required_feats and required_spells %},{% endif %}
     <i>
     {% for required_spell in required_spells %}
-        <a href="{{ required_spell.get_absolute_url }}">{{ required_spell }}</a>{% if not forloop.last %}, {% endif %}
+        <a href="{{ required_spell.get_absolute_url }}">{{ required_spell.name }}</a>{% if not forloop.last %}, {% endif %}
     {% endfor %}
     </i>
     {{ item.required_extra }}.

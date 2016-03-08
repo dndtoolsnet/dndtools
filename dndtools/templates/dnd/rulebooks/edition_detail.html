@@ -5,7 +5,7 @@
 {% block title %}{{ dnd_edition.name }} &ndash; Editions{% endblock %}
 
 {% block breadcrumbs %}
-    &raquo; <a href="{% url 'edition_list'  %}">Editions</a>
+    &raquo; <a href="{% url 'dnd:rulebooks:edition_list'  %}">Editions</a>
     &raquo; <a href="{{ dnd_edition.get_absolute_url }}">{{ dnd_edition.name }}</a>
 {% endblock %}
 

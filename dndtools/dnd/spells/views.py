@@ -1,8 +1,7 @@
 # Create your views here.
 from datetime import datetime
 from django.http import HttpResponseForbidden
-from django.shortcuts import get_object_or_404, render_to_response
-from django.template.context import RequestContext
+from django.shortcuts import get_object_or_404, render
 from dnd.menu import MenuItem
 from dnd.menu import menu_item, submenu_item
 from dnd.dnd_paginator import DndPaginator
@@ -26,14 +25,8 @@ def spell_index(request):
 
     form_submitted = 1 if '_filter' in request.GET else 0
 
-    return render_to_response('dnd/spells/spell_index.html',
-                              {
-                                  'request': request,
-                                  'spell_list': paginator.items(),
-                                  'paginator': paginator,
-                                  'filter': f,
-                                  'form_submitted': form_submitted,
-                              }, context_instance=RequestContext(request), )
+    return render(request, 'dnd/spells/spell_index.html', context={'spell_list': paginator.items(),
+      'paginator': paginator, 'filter': f, 'form_submitted': form_submitted,},)
 
 
 @menu_item(MenuItem.MAGIC)
@@ -46,14 +39,9 @@ def spell_descriptor_list(request):
 
     form_submitted = 1 if '_filter' in request.GET else 0
 
-    return render_to_response('dnd/spells/spell_descriptor_list.html',
-                              {
-                                  'request': request,
-                                  'spell_descriptor_list': paginator.items(),
-                                  'paginator': paginator,
-                                  'filter': f,
-                                  'form_submitted': form_submitted,
-                              }, context_instance=RequestContext(request), )
+    return render(request, 'dnd/spells/spell_descriptor_list.html', context=
+      {'spell_descriptor_list': paginator.items(), 'paginator': paginator, 'filter': f,
+       'form_submitted': form_submitted,},)
 
 
 @menu_item(MenuItem.MAGIC)
@@ -61,11 +49,8 @@ def spell_descriptor_list(request):
 def spell_school_list(request):
     spell_school_list = SpellSchool.objects.all()
     spell_sub_school_list = SpellSubSchool.objects.all()
-    return render_to_response('dnd/spells/spell_school_list.html',
-                              {
-                                  'spell_school_list': spell_school_list,
-                                  'spell_sub_school_list': spell_sub_school_list,
-                                  'request': request, }, context_instance=RequestContext(request), )
+    return render(request, 'dnd/spells/spell_school_list.html', context=
+      {'spell_school_list': spell_school_list, 'spell_sub_school_list': spell_sub_school_list,},)
 
 
 @menu_item(MenuItem.MAGIC)
@@ -73,7 +58,7 @@ def spell_school_list(request):
 def spells_in_rulebook(request, rulebook_slug, rulebook_id):
     rulebook = get_object_or_404(Rulebook, pk=rulebook_id)
     if not rulebook.slug == rulebook_slug:
-        return permanent_redirect_view(request, 'spells_in_rulebook',
+        return permanent_redirect_view(request, 'dnd:spells:spells_in_rulebook',
                                        kwargs={
                                            'rulebook_slug': rulebook.slug,
                                            'rulebook_id': rulebook_id, })
@@ -83,39 +68,27 @@ def spells_in_rulebook(request, rulebook_slug, rulebook_id):
 
     paginator = DndPaginator(spell_list, request)
 
-    return render_to_response('dnd/spells/spells_in_rulebook.html',
-                              {
-                                  'rulebook': rulebook,
-                                  'spell_list': paginator.items(),
-                                  'paginator': paginator,
-                                  'request': request,
-                                  'display_3e_warning': is_3e_edition(rulebook.dnd_edition),
-                              }, context_instance=RequestContext(request), )
+    return render(request, 'dnd/spells/spells_in_rulebook.html', context={'rulebook': rulebook,
+      'spell_list': paginator.items(), 'paginator': paginator,
+      'display_3e_warning': is_3e_edition(rulebook.dnd_edition),},)
 
 
 @menu_item(MenuItem.MAGIC)
 @submenu_item(MenuItem.Magic.SPELLS)
 def spell_detail(request, rulebook_slug, rulebook_id, spell_slug, spell_id):
     spell = get_object_or_404(Spell.objects.select_related(
-        'rulebook', 'rulebook__dnd_edition', 'school', 'sub_school',
-        'class_levels'
-    ), pk=spell_id)
+        'rulebook', 'rulebook__dnd_edition', 'school', 'sub_school').prefetch_related('class_levels'), pk=spell_id)
 
     if (spell.slug != spell_slug or
-                unicode(spell.rulebook.id) != rulebook_id or
+                str(spell.rulebook.id) != rulebook_id or
                 spell.rulebook.slug != rulebook_slug):
         return permanent_redirect_object(request, spell)
 
-    spell_class_level_set = spell.spellclasslevel_set.select_related(
-        'rulebook', 'character_class',
-    ).all()
-    spell_domain_level_set = spell.spelldomainlevel_set.select_related(
-        'rulebook', 'domain',
-    ).all()
+    spell_class_level_set = spell.spellclasslevel_set.select_related('character_class').prefetch_related('spell__rulebook').all()
+    spell_domain_level_set = spell.spelldomainlevel_set.select_related('domain').all()
 
     # related spells
-    related_spells = Spell.objects.filter(slug=spell.slug).exclude(rulebook__id=spell.rulebook.id).select_related(
-        'rulebook').all()
+    related_spells = Spell.objects.filter(slug=spell.slug).exclude(rulebook__id=spell.rulebook.id).prefetch_related('rulebook').all()
 
     # corrupt component -- will be linked to corrupt rule
     if spell.corrupt_component:
@@ -123,20 +96,11 @@ def spell_detail(request, rulebook_slug, rulebook_id, spell_slug, spell_id):
     else:
         corrupt_rule = None
 
-    return render_to_response('dnd/spells/spell_detail.html',
-                              {
-                                  'spell': spell,
-                                  'spellclasslevel_set': spell_class_level_set,
-                                  'spelldomainlevel_set': spell_domain_level_set,
-                                  'corrupt_rule': corrupt_rule,
-                                  'rulebook': spell.rulebook,
-                                  'request': request,
-                                  'i_like_it_url': request.build_absolute_uri(),
-                                  'inaccurate_url': request.build_absolute_uri(),
-                                  'display_3e_warning': is_3e_edition(spell.rulebook.dnd_edition),
-                                  'related_spells': related_spells,
-                              },
-                              context_instance=RequestContext(request), )
+    return render(request, 'dnd/spells/spell_detail.html', context={'spell': spell,
+      'spellclasslevel_set': spell_class_level_set, 'spelldomainlevel_set': spell_domain_level_set,
+      'corrupt_rule': corrupt_rule, 'rulebook': spell.rulebook,
+      'i_like_it_url': request.build_absolute_uri(), 'inaccurate_url': request.build_absolute_uri(),
+      'display_3e_warning': is_3e_edition(spell.rulebook.dnd_edition), 'related_spells': related_spells,},)
 
 
 def spell_verify(request, spell_id):
@@ -159,20 +123,13 @@ def spell_descriptor_detail(request, spell_descriptor_slug):
     spell_descriptor = get_object_or_404(SpellDescriptor,
                                          slug=spell_descriptor_slug)
 
-    spell_list = spell_descriptor.spell_set.select_related(
-        'rulebook', 'rulebook__dnd_edition', 'school').all()
+    spell_list = spell_descriptor.spell_set.select_related('rulebook__dnd_edition', 'school').prefetch_related('rulebook').all()
 
     paginator = DndPaginator(spell_list, request)
 
-    return render_to_response('dnd/spells/spell_descriptor_detail.html',
-                              {
-                                  'spell_descriptor': spell_descriptor,
-                                  'spell_list': paginator.items(),
-                                  'paginator': paginator,
-                                  'request': request,
-                                  'i_like_it_url': request.build_absolute_uri(),
-                                  'inaccurate_url': request.build_absolute_uri(), },
-                              context_instance=RequestContext(request), )
+    return render(request, 'dnd/spells/spell_descriptor_detail.html', context=
+      {'spell_descriptor': spell_descriptor, 'spell_list': paginator.items(), 'paginator': paginator,
+       'i_like_it_url': request.build_absolute_uri(), 'inaccurate_url': request.build_absolute_uri(),},)
 
 
 @menu_item(MenuItem.MAGIC)
@@ -180,20 +137,13 @@ def spell_descriptor_detail(request, spell_descriptor_slug):
 def spell_school_detail(request, spell_school_slug):
     spell_school = get_object_or_404(SpellSchool, slug=spell_school_slug)
 
-    spell_list = spell_school.spell_set.select_related(
-        'rulebook', 'rulebook__dnd_edition', 'school').all()
+    spell_list = spell_school.spell_set.select_related('rulebook__dnd_edition', 'school').prefetch_related('rulebook').all()
 
     paginator = DndPaginator(spell_list, request)
 
-    return render_to_response('dnd/spells/spell_school_detail.html',
-                              {
-                                  'spell_school': spell_school,
-                                  'spell_list': paginator.items(),
-                                  'paginator': paginator,
-                                  'request': request,
-                                  'i_like_it_url': request.build_absolute_uri(),
-                                  'inaccurate_url': request.build_absolute_uri(), },
-                              context_instance=RequestContext(request), )
+    return render(request, 'dnd/spells/spell_school_detail.html', context={'spell_school': spell_school,
+      'spell_list': paginator.items(), 'paginator': paginator, 'i_like_it_url': request.build_absolute_uri(),
+      'inaccurate_url': request.build_absolute_uri(), },)
 
 
 @menu_item(MenuItem.MAGIC)
@@ -202,20 +152,13 @@ def spell_sub_school_detail(request, spell_sub_school_slug):
     spell_sub_school = get_object_or_404(SpellSubSchool,
                                          slug=spell_sub_school_slug)
 
-    spell_list = spell_sub_school.spell_set.select_related(
-        'rulebook', 'rulebook__dnd_edition', 'school').all()
+    spell_list = spell_sub_school.spell_set.select_related('rulebook__dnd_edition', 'school').prefetch_related('rulebook').all()
 
     paginator = DndPaginator(spell_list, request)
 
-    return render_to_response('dnd/spells/spell_sub_school_detail.html',
-                              {
-                                  'spell_sub_school': spell_sub_school,
-                                  'spell_list': paginator.items(),
-                                  'paginator': paginator,
-                                  'request': request,
-                                  'i_like_it_url': request.build_absolute_uri(),
-                                  'inaccurate_url': request.build_absolute_uri(), },
-                              context_instance=RequestContext(request), )
+    return render(request, 'dnd/spells/spell_sub_school_detail.html', context={'spell_sub_school': spell_sub_school,
+      'spell_list': paginator.items(), 'paginator': paginator,
+      'i_like_it_url': request.build_absolute_uri(), 'inaccurate_url': request.build_absolute_uri(), },)
 
 
 @menu_item(MenuItem.MAGIC)
@@ -227,28 +170,20 @@ def spell_domain_list(request):
 
     form_submitted = 1 if '_filter' in request.GET else 0
 
-    return render_to_response('dnd/spells/spell_domain_list.html',
-                              {
-                                  'request': request,
-                                  'spell_domain_list': paginator.items(),
-                                  'paginator': paginator,
-                                  'filter': f,
-                                  'form_submitted': form_submitted,
-                              }, context_instance=RequestContext(request), )
+    return render(request, 'dnd/spells/spell_domain_list.html', context={'spell_domain_list': paginator.items(),
+      'paginator': paginator, 'filter': f, 'form_submitted': form_submitted,},)
 
 
 @menu_item(MenuItem.MAGIC)
 @submenu_item(MenuItem.Magic.DOMAINS)
 def spell_domain_detail(request, spell_domain_slug, rulebook_slug=None, rulebook_id=None):
     # fetch the class
-    spell_domain = get_object_or_404(Domain.objects.select_related(
-        'domain_variant', 'domain_variant__rulebook'), slug=spell_domain_slug)
+    spell_domain = get_object_or_404(Domain.objects.prefetch_related(
+        'variant', 'variant__rulebook'), slug=spell_domain_slug)
 
     # fetch primary variant, this is independent of rulebook selected
     try:
-        primary_variant = DomainVariant.objects.select_related(
-            'rulebook', 'rulebook__dnd_edition',
-        ).filter(
+        primary_variant = DomainVariant.objects.select_related('rulebook__dnd_edition',).prefetch_related('rulebook').filter(
             domain=spell_domain,
         ).order_by('-rulebook__dnd_edition__core', '-rulebook__published')[0]
     except Exception:
@@ -259,8 +194,7 @@ def spell_domain_detail(request, spell_domain_slug, rulebook_slug=None, rulebook
         # use canonical link in head as this is more or less duplicated content
         use_canonical_link = True
         selected_variant = get_object_or_404(
-            DomainVariant.objects.select_related(
-                'domain', 'rulebook', 'rulebook__dnd_edition'),
+            DomainVariant.objects.select_related('domain', 'rulebook__dnd_edition').prefetch_related('rulebook'),
             domain__slug=spell_domain_slug,
             rulebook__pk=rulebook_id)
 
@@ -282,8 +216,7 @@ def spell_domain_detail(request, spell_domain_slug, rulebook_slug=None, rulebook
     other_variants = [
         variant
         for variant
-        in spell_domain.domainvariant_set.select_related(
-            'rulebook', 'rulebook__dnd_edition', 'spell_domain').all()
+        in spell_domain.variant.select_related('rulebook__dnd_edition', 'domain').prefetch_related('rulebook').all()
         if variant != selected_variant
     ]
 
@@ -292,21 +225,12 @@ def spell_domain_detail(request, spell_domain_slug, rulebook_slug=None, rulebook
     else:
         display_3e_warning = False
 
-    spell_list = spell_domain.spell_set.select_related(
-        'rulebook', 'rulebook__dnd_edition', 'school').all()
+    spell_list = spell_domain.spell_set.select_related('rulebook__dnd_edition', 'school').prefetch_related('rulebook').all()
 
     paginator = DndPaginator(spell_list, request)
 
-    return render_to_response('dnd/spells/spell_domain_detail.html',
-                              {
-                                  'spell_domain': spell_domain,
-                                  'spell_list': paginator.items(),
-                                  'paginator': paginator,
-                                  'request': request,
-                                  'i_like_it_url': request.build_absolute_uri(),
-                                  'inaccurate_url': request.build_absolute_uri(),
-                                  'selected_variant': selected_variant,
-                                  'other_variants': other_variants,
-                                  'use_canonical_link': use_canonical_link,
-                                  'display_3e_warning': display_3e_warning, },
-                              context_instance=RequestContext(request), )
+    return render(request, 'dnd/spells/spell_domain_detail.html', context={'spell_domain': spell_domain,
+      'spell_list': paginator.items(), 'paginator': paginator, 'i_like_it_url': request.build_absolute_uri(),
+      'inaccurate_url': request.build_absolute_uri(), 'selected_variant': selected_variant,
+      'other_variants': other_variants, 'use_canonical_link': use_canonical_link,
+      'display_3e_warning': display_3e_warning, },)

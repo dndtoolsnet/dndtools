@@ -1,33 +1,15 @@
-# -*- coding: utf-8 -*-
-
 from django.conf.urls import patterns, url
+from .views import contact, contact_sent, staff
 
 
-urlpatterns = patterns(
-    'dnd.contacts.views',
-
+app_name = 'contacts'
+urlpatterns = [
     # contact
-    url(
-        r'^$',
-        'contact',
-        name='contact',
-    ),
+    url(r'^$', contact, name='contact'),
+
     # contact > sent
-    url(
-        r'^sent/$',
-        'contact_sent',
-        name='contact_sent',
-    ),
+    url(r'^sent/$', contact_sent, name='contact_sent'),
+
     # staff
-    url(
-        r'^staff/$',
-        'staff',
-        name='staff',
-    ),
-    # android
-    url(
-        r'^android/$',
-        'android',
-        name='android',
-    ),
-)
+    url(r'^staff/$', staff, name='staff'),
+]

@@ -14,7 +14,7 @@
 
     <div class="close-paragraphs">
         <p>
-            <strong>{{ monster.size }} {{ monster.type.name }}
+            <strong>{{ monster.size.name }} {{ monster.type.name }}
                 {% if monster_subtypes %}
                     ({% for subtype in monster_subtypes %}{% if not forloop.first %}
                     , {% endif %}{{ subtype.name }}{% endfor %})

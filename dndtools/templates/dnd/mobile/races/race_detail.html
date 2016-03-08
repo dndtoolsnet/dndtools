@@ -18,7 +18,7 @@
         <tr>
             <th>Size:</th>
             <td>
-                {{ race.size }}
+                {{ race.size.name }}
             </td>
         </tr>
         <tr>
@@ -26,7 +26,7 @@
             <td>
                 {% for speed in race_speeds %}
                     {% if not forloop.first %}, {% endif %}
-                    {{ speed.type }} {{ speed.speed }}
+                    {{ speed.type.name }} {{ speed.speed }}
                 {% endfor %}
             </td>
         </tr>

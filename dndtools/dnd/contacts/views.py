@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
 from django.core.mail.message import EmailMessage
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
-from django.shortcuts import render_to_response
-from django.template.context import RequestContext
+from django.shortcuts import render
 from dnd.menu import menu_item, submenu_item, MenuItem
 from dnd.forms import ContactForm
 from dnd.models import StaticPage
@@ -41,19 +39,13 @@ def contact(request):
         form = ContactForm()  # An unbound form
 
     # request context required for CSRF
-    return render_to_response('dnd/contacts/contact.html',
-                              {
-                                  'request': request,
-                                  'form': form, }, context_instance=RequestContext(request), )
+    return render(request, 'dnd/contacts/contact.html', context={'form': form,},)
 
 
 @menu_item(MenuItem.CONTACTS)
 @submenu_item(MenuItem.Contacts.CONTACT_US)
 def contact_sent(request):
-    return render_to_response('dnd/contacts/contact_sent.html',
-                              {
-                                  'request': request,
-                              }, context_instance=RequestContext(request), )
+    return render(request, 'dnd/contacts/contact_sent.html',)
 
 
 @menu_item(MenuItem.CONTACTS)
@@ -61,19 +53,4 @@ def contact_sent(request):
 def staff(request):
     page_body = StaticPage.objects.filter(name='staff')[0]
 
-    return render_to_response('dnd/contacts/staff.html',
-                              {
-                                  'request': request,
-                                  'page_body': page_body,
-                              }, context_instance=RequestContext(request), )
-
-
-@menu_item(MenuItem.ANDROID)
-def android(request):
-    page_body = StaticPage.objects.get(name='android')
-
-    return render_to_response('dnd/static/android.html',
-                              {
-                                  'request': request,
-                                  'page_body': page_body,
-                              }, context_instance=RequestContext(request), )
+    return render(request, 'dnd/contacts/staff.html', {'page_body': page_body,},)

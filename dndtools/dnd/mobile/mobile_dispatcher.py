@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import re
 
 from django.core.urlresolvers import reverse
@@ -27,20 +26,20 @@ class MobileDispatcher(object):
 
     @staticmethod
     def _dispatch_feat_index(args, kwargs):
-        return reverse('feat_index_mobile')
+        return reverse('dnd:mobile:feats:feat_index_mobile')
 
     @staticmethod
     def _dispatch_feat_category_list(args, kwargs):
-        return reverse('feat_detail_mobile')
+        return reverse('dnd:mobile:feats:feat_detail_mobile')
 
     @staticmethod
     def _dispatch_feat_category_detail(args, kwargs):
-        return reverse('feat_category_detail_mobile', kwargs=kwargs)
+        return reverse('dnd:mobile:feats:feat_category_detail_mobile', kwargs=kwargs)
 
     @staticmethod
     def _dispatch_feats_in_rulebook(args, kwargs):
-        return reverse('feats_in_rulebook_mobile', kwargs={'rulebook_id': kwargs['rulebook_id']})
+        return reverse('dnd:mobile:feats:feats_in_rulebook_mobile', kwargs={'rulebook_id': kwargs['rulebook_id']})
 
     @staticmethod
     def _dispatch_feat_detail(args, kwargs):
-        return reverse('feat_detail_mobile', kwargs={'feat_id': kwargs['feat_id']})
+        return reverse('dnd:mobile:feats:feat_detail_mobile', kwargs={'feat_id': kwargs['feat_id']})

@@ -1,16 +1,12 @@
-# -*- coding: utf-8 -*-
-
 from django.conf.urls import patterns, url
+from .views import index_mobile
 
 
-urlpatterns = patterns(
-    'dnd.mobile.index.views',
-
-
+app_name = 'index'
+urlpatterns = [
     # index
     url(
-        r'^$',
-        'index_mobile',
+        r'^$', index_mobile,
         name='index_mobile',
     ),
-)
+]

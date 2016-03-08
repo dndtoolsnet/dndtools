@@ -1,15 +1,15 @@
 {% load custom_filters %}
 
-<strong>Property:</strong> {{ item.property|empty_as_dash }}<br/>
+<strong>Property:</strong> {{ item.property.name|empty_as_dash }}<br/>
 
 <strong>Caster Level:</strong> {{ item.caster_level|ordinal_number }}<br/>
 
-<strong>Aura:</strong> {{ item.aura }};
+<strong>Aura:</strong> {{ item.aura.name }};
 {% if item.aura_dc %}
     (DC {{ item.aura_dc }})
 {% endif %}
 {% for aura_school in aura_schools %}
-    <a href="{{ aura_school.get_absolute_url_mobile }}">{{ aura_school }}</a>{% if not forloop.last %}, {% endif %}
+    <a href="{{ aura_school.get_absolute_url_mobile }}">{{ aura_school.name }}</a>{% if not forloop.last %}, {% endif %}
 {% endfor %}<br/>
 
 <strong>Activation:</strong> {{ item.activation|empty_as_dash }}<br/>

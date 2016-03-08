@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
-from django.shortcuts import get_object_or_404, render_to_response
-from django.template import RequestContext
+from django.shortcuts import get_object_or_404, render
 from dnd.menu import menu_item
 from dnd.filters import CharacterClassFilter
 from dnd.mobile.dnd_paginator import DndMobilePaginator
@@ -21,21 +19,16 @@ def character_class_list_mobile(request):
 
     paginator = DndMobilePaginator(f.qs, request)
 
-    return render_to_response('dnd/mobile/character_classes/character_class_list.html',
-                              {
-                                  'character_class_list': paginator.items(),
-                                  'paginator': paginator,
-                                  'request': request,
-                                  'filter': f,
-                                  'form_submitted': form_submitted,
-                              }, context_instance=RequestContext(request), )
+    return render(request, 'dnd/mobile/character_classes/character_class_list.html', context=
+      {'character_class_list': paginator.items(), 'paginator': paginator, 'filter': f,
+       'form_submitted': form_submitted,},)
 
 
 @menu_item("classes")
 def character_class_detail_mobile(request, character_class_slug, rulebook_slug=None, rulebook_id=None):
     # fetch the class
     character_class = get_object_or_404(
-        CharacterClass.objects.select_related('character_class_variant', 'character_class_variant__rulebook'),
+        CharacterClass.objects.prefetch_related('variant', 'variant__rulebook'),
         slug=character_class_slug)
 
     assert isinstance(character_class, CharacterClass)
@@ -67,7 +60,7 @@ def character_class_detail_mobile(request, character_class_slug, rulebook_slug=N
         # selected variant is primary! Redirect to canonical url
         if selected_variant == primary_variant:
             return permanent_redirect_view(
-                request, character_class_detail_mobile, kwargs={
+                request, 'dnd:mobile:character_classes:character_class_detail_mobile', kwargs={
                     'character_class_slug': character_class_slug}
             )
     else:
@@ -78,7 +71,7 @@ def character_class_detail_mobile(request, character_class_slug, rulebook_slug=N
     other_variants = [
         variant
         for variant
-        in character_class.characterclassvariant_set.select_related(
+        in character_class.variant.select_related(
             'rulebook', 'rulebook__dnd_edition', 'character_class').all()
         if variant != selected_variant
     ]
@@ -94,20 +87,11 @@ def character_class_detail_mobile(request, character_class_slug, rulebook_slug=N
         required_feats = ()
         display_3e_warning = False
 
-    return render_to_response('dnd/mobile/character_classes/character_class_detail.html',
-                              {
-                                  'character_class': character_class,
-                                  'request': request,
-                                  'i_like_it_url': request.build_absolute_uri(),
-                                  'inaccurate_url': request.build_absolute_uri(),
-                                  'selected_variant': selected_variant,
-                                  'required_races': required_races,
-                                  'required_skills': required_skills,
-                                  'required_feats': required_feats,
-                                  'other_variants': other_variants,
-                                  'use_canonical_link': use_canonical_link,
-                                  'display_3e_warning': display_3e_warning,
-                              }, context_instance=RequestContext(request), )
+    return render(request, 'dnd/mobile/character_classes/character_class_detail.html', context=
+      {'character_class': character_class, 'i_like_it_url': request.build_absolute_uri(),
+       'inaccurate_url': request.build_absolute_uri(), 'selected_variant': selected_variant,
+       'required_races': required_races, 'required_skills': required_skills, 'required_feats': required_feats,
+       'other_variants': other_variants, 'use_canonical_link': use_canonical_link, 'display_3e_warning': display_3e_warning,},)
 
 
 @menu_item("classes")
@@ -124,14 +108,9 @@ def character_class_spells_mobile(request, character_class_slug, level):
 
     paginator = DndMobilePaginator(spell_list, request)
 
-    return render_to_response('dnd/mobile/character_classes/character_class_spells.html',
-                              {
-                                  'character_class': character_class,
-                                  'spell_list': paginator.items(),
-                                  'paginator': paginator,
-                                  'level': level,
-                                  'request': request, }, context_instance=RequestContext(request),
-    )
+    return render(request, 'dnd/mobile/character_classes/character_class_spells.html', context=
+      {'character_class': character_class, 'spell_list': paginator.items(), 'paginator': paginator,
+       'level': level,},)
 
 
 @menu_item("classes")
@@ -149,10 +128,6 @@ def character_classes_in_rulebook_mobile(request, rulebook_slug, rulebook_id):
         in rulebook.characterclassvariant_set.select_related('character_class').all()
     ]
 
-    return render_to_response('dnd/mobile/character_classes/character_classes_in_rulebook.html',
-                              {
-                                  'rulebook': rulebook,
-                                  'class_list': class_list,
-                                  'request': request,
-                                  'display_3e_warning': is_3e_edition(rulebook.dnd_edition),
-                              }, context_instance=RequestContext(request), )
+    return render(request, 'dnd/mobile/character_classes/character_classes_in_rulebook.html', context=
+      {'rulebook': rulebook, 'class_list': class_list, 'display_3e_warning': is_3e_edition(rulebook.dnd_edition),},)
+    
